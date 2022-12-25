@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Build Directory
+build/
+
+# PDF Documents
+*.pdf
+
+# IDE Files
+*.kdev4
