@@ -3,7 +3,7 @@
 
 int main(void)
 {
-	float x = std::numeric_limits<float>::max();
+	double x = 2;
 
 	std::cout << x << std::endl;
 	std::cout << Q_rsqrt(x) << std::endl;
