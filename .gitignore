@@ -1,0 +1,6 @@
+*.pdf
+*.o
+*.so
+*.a
+*.out
+build/
