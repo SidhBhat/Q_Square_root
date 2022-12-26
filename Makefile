@@ -19,7 +19,7 @@ SHARED =
 CXX         = g++
 CXXLIBS     =
 CXXINCLUDES =
-CXXFLAGS    = -g -O -Wall -std=c++20
+CXXFLAGS    = -g -Og -Wall -std=c++20
 ifdef SHARED
 CXXFLAGS += -fpie
 endif
