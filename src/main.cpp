@@ -1,56 +1,71 @@
-#include <iostream>
-#include "Quake.hpp"
-#include <getopt.h>
-#include <string>
-#include <cmath>
-#include <stdexcept>
-#include <iomanip>
+#include <iostream>    // input output
+#include "Quake.hpp"   // Quake Alogorithm
+// credit: @jarro2783 on Github (https://github.com/jarro2783)
+#include "../cxxopts/include/cxxopts.hpp"  // external library to pharse commandline
+#include <string>      // for  std::stod
+#include <cmath>       // for std::sqrt
+#include <stdexcept>   // for std::invalid_argument & std::out_of_range
+#include <iomanip>     // for std::setprecision
 
-extern char *optarg;
-extern int optind;
-extern int opterr;   // disable automatic error message
-extern int optopt;
+#include <assert.h>
 
-static int long_opt_index = 0;
-static const option long_opts[]
-	= {
-		{ "double", 0, NULL, 'd' },
-		{ "float", 0, NULL, 'f' },
-		{ "help", 0, NULL, 'h' },
-		{ 0, 0, 0, 0 }
-	};
+#define PROGRAM_NAME "quaketest"
 
-static const char helpmsg[]
+static const std::string helpmsg
 	=   "  -d, --double\t\tUse IEC 559 (IEEE 754) double precision (the defualt)\n"
 		"  -f, --float\t\tUse IEC 559 (IEEE 754) single precision\n"
 		"  -h, --help\t\tPrint this message\n";
 
-int main(int argc, char **argv)
+// const paranoia
+int main(const int argc, const char *const *const argv)
 {
-	int opt;
-	int ftl_tp = 'd';
+	int ftl_tp = 'k';
 
-	while ((opt = getopt_long(argc, argv, "fdh", long_opts, &long_opt_index)) != -1)
-		switch(opt) {
-			case 'f':
-				ftl_tp = 'f';
-				break;
-			case 'd':
-				ftl_tp = 'd';
-				break;
-			case 'h':
-				std::cout << "usage: " << *argv
-				<< " [options] -- <number>\n\n" << helpmsg;
-				return 0;
-			case '?':
-				return 1;
+	cxxopts::Options options(PROGRAM_NAME,"Program to test Q_rsqrt()");
+	options.add_options()
+		("d,double", "Use IEC 559 (IEEE 754) double precision (the defualt)")
+		("f,float",  "Use IEC 559 (IEEE 754) single precision")
+		("h,help",   "Print this message")
+		("number",   "The number to give Q_rsqrt", cxxopts::value<std::string>());
+
+	options.parse_positional("number");
+	options.positional_help("<NUMBER>");
+
+	std::string num;
+	try {
+
+		auto result = options.parse(argc, argv);
+
+		if(result.count("help")) {
+			std::cout << options.help() << std::endl;
+			return 0;
 		}
 
+		const auto argvec = result.arguments();
+		auto       it     = argvec.begin();
+		const auto it_end = argvec.end();
+
+		while(it != it_end)
+		{
+			if (!(*it).key().compare("double"))
+				ftl_tp = 'd';
+			else if(!(*it).key().compare("float"))
+				ftl_tp = 'f';
+			it++;
+		}
+
+		num = argvec.back().value();
+	}
+	catch (const cxxopts::exceptions::parsing &ex) {
+		std::cout << "Error while pharsing commandline: "
+			<< ex.what() << std::endl;
+	}
+
 	try {
+		std::cout << std::setprecision(10);
 		switch(ftl_tp) {
 			case 'd': {
-					double x = std::stod(*(argv + optind));
-					std::cout << std::setprecision(10);
+					double x = std::stod(num);
 					std::cout << "x => Double precision IEEE 754" << std::endl;
 					std::cout << "x =\t\t" << x << std::endl;
 					std::cout << "1/sqrt(x)  =\t" << 1/std::sqrt(x) << std::endl;
@@ -58,8 +73,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'f': {
-					float x = std::stod(*(argv + optind));
-					std::cout << std::setprecision(10);
+					float x = std::stod(num);
 					std::cout << "x => Single precision IEEE 754" << std::endl;
 					std::cout << "x =\t\t" << x << std::endl;
 					std::cout << "1/sqrt(x) =\t" << 1/std::sqrt(x) << std::endl;
@@ -69,13 +83,13 @@ int main(int argc, char **argv)
 		}
 	}
 	catch(const std::invalid_argument & exp1 ) {
-		std::cout << "Not a inavlid number: "
-			<< *(argv + optind) << std::endl;
+		std::cout << "Not a valid number: "
+			<< num << std::endl;
 		return 2;
 	}
 	catch(const std::out_of_range & exp2 ) {
 		std::cout << "Number is out of range: "
-		<< *(argv + optind) << std::endl;
+		<< num << std::endl;
 		return 2;
 	}
 
