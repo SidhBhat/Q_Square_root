@@ -11,31 +11,28 @@
 
 #define PROGRAM_NAME "quaketest"
 
-static const std::string helpmsg
-	=   "  -d, --double\t\tUse IEC 559 (IEEE 754) double precision (the defualt)\n"
-		"  -f, --float\t\tUse IEC 559 (IEEE 754) single precision\n"
-		"  -h, --help\t\tPrint this message\n";
-
 // const paranoia
 int main(const int argc, const char *const *const argv)
 {
-	int ftl_tp = 'k';
+	// flag to determine float type
+	int ftl_tp = 'd';
 
+	// Set up options
 	cxxopts::Options options(PROGRAM_NAME,"Program to test Q_rsqrt()");
 	options.add_options()
 		("d,double", "Use IEC 559 (IEEE 754) double precision (the defualt)")
 		("f,float",  "Use IEC 559 (IEEE 754) single precision")
 		("h,help",   "Print this message")
 		("number",   "The number to give Q_rsqrt", cxxopts::value<std::string>());
-
+	// positional options
 	options.parse_positional("number");
 	options.positional_help("<NUMBER>");
 
-	std::string num;
+	std::string num; // string to hold the number
 	try {
-
+		// pharse the options
 		auto result = options.parse(argc, argv);
-
+		// print help
 		if(result.count("help")) {
 			std::cout << options.help() << std::endl;
 			return 0;
@@ -44,7 +41,9 @@ int main(const int argc, const char *const *const argv)
 		const auto argvec = result.arguments();
 		auto       it     = argvec.begin();
 		const auto it_end = argvec.end();
-
+		/* Pharse -f and -d in the order they come
+		 * set flag to the last flag on the commandline
+		 */
 		while(it != it_end)
 		{
 			if (!(*it).key().compare("double"))
@@ -53,7 +52,7 @@ int main(const int argc, const char *const *const argv)
 				ftl_tp = 'f';
 			it++;
 		}
-
+		// fetch the number
 		num = argvec.back().value();
 	}
 	catch (const cxxopts::exceptions::parsing &ex) {
@@ -62,10 +61,10 @@ int main(const int argc, const char *const *const argv)
 	}
 
 	try {
-		std::cout << std::setprecision(10);
+		std::cout << std::setprecision(10);  // set 10 digits of precision
 		switch(ftl_tp) {
 			case 'd': {
-					double x = std::stod(num);
+					double x = std::stod(num); // convert string to number
 					std::cout << "x => Double precision IEEE 754" << std::endl;
 					std::cout << "x =\t\t" << x << std::endl;
 					std::cout << "1/sqrt(x)  =\t" << 1/std::sqrt(x) << std::endl;
@@ -73,7 +72,7 @@ int main(const int argc, const char *const *const argv)
 				}
 				break;
 			case 'f': {
-					float x = std::stod(num);
+					float x = std::stod(num); // convert string to number
 					std::cout << "x => Single precision IEEE 754" << std::endl;
 					std::cout << "x =\t\t" << x << std::endl;
 					std::cout << "1/sqrt(x) =\t" << 1/std::sqrt(x) << std::endl;
