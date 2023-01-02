@@ -39,3 +39,8 @@ build/
 
 # IDE Files
 *.kdev4
+# Visual Studio files
+.vs/
+# Visual Studio Code files
+.vscode/
+*.code-workspace
