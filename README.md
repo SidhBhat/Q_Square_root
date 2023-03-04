@@ -5,7 +5,7 @@ The fast inverse square root alogorithim to compute the inverse sqaure root `1\s
 You can find the original [here](https://github.com/id-Software/Quake-III-Arena/blob/master/code/game/q_math.c)
 near line 552.
 
-## The Quake Alogorithm
+## The Quake Algorithm
 
 We will not go in depth of how this algorithm works here, but basically we attempt inteprete a floating
 point number `x` as a integer in orger to approximate $log_2(x)$.
